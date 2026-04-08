@@ -1,0 +1,605 @@
+{
+  "info": {
+    "name": "LaraJobs B2B API",
+    "description": "Full B2B marketplace API — Supplier Listings, Project Requests, Quotes, Inquiries, Messaging, and Auth.",
+    "_postman_id": "larajobs-b2b-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.golarajobs.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Bearer token — set automatically by the Login request"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed Al-Rashid\",\n  \"company\": \"Al-Rashid Contracting\",\n  \"email\": \"ahmed@alrashid.sa\",\n  \"password\": \"secret123\",\n  \"password_confirmation\": \"secret123\",\n  \"role\": \"both\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "auth", "register"]
+            },
+            "description": "Register a new B2B user. `role` is one of: supplier | project_owner | both"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmed@alrashid.sa\",\n  \"password\": \"secret123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "me"]
+            },
+            "description": "Returns the authenticated user with plan limits (remainingAds, remainingRequests)."
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed Al-Rashid\",\n  \"company\": \"Al-Rashid Contracting\",\n  \"avatar\": null,\n  \"role\": \"both\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Supplier Listings",
+      "item": [
+        {
+          "name": "List All Listings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings?category=Construction+Materials&search=steel&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings"],
+              "query": [
+                { "key": "category", "value": "Construction Materials", "description": "Filter by category (optional)" },
+                { "key": "search", "value": "steel", "description": "Full-text search on title/description (optional)" },
+                { "key": "page", "value": "1" },
+                { "key": "per_page", "value": "15" }
+              ]
+            },
+            "description": "Returns paginated active listings. No auth required for browsing."
+          }
+        },
+        {
+          "name": "Get Single Listing",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", ":id"],
+              "variable": [{ "key": "id", "value": "sl1" }]
+            }
+          }
+        },
+        {
+          "name": "Get My Listings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/mine",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", "mine"]
+            },
+            "description": "Returns all listings owned by the authenticated user (active + disabled)."
+          }
+        },
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Construction Materials\",\n  \"title\": \"Premium Grade Steel Rebars — Bulk Supply\",\n  \"description\": \"High-tensile steel rebars (Grade 60) available in bulk quantities. Certified to ASTM A615.\",\n  \"quantity\": \"50–5,000 tons\",\n  \"delivery_time\": \"7–14 days\",\n  \"min_order_value\": \"SAR 50,000\",\n  \"featured\": false,\n  \"contact_phone\": \"+966501234001\",\n  \"contact_whatsapp\": \"+966501234001\",\n  \"contact_email\": \"sales@company.sa\",\n  \"contact_website\": \"https://company.sa\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings"]
+            },
+            "description": "Creates a new listing. Decrements remainingAds by 1. Returns 402 if limit reached."
+          }
+        },
+        {
+          "name": "Update Listing",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Steel Rebars Title\",\n  \"description\": \"Updated description.\",\n  \"quantity\": \"100–10,000 tons\",\n  \"delivery_time\": \"5–10 days\",\n  \"min_order_value\": \"SAR 30,000\",\n  \"contact_phone\": \"+966501234999\",\n  \"contact_whatsapp\": \"+966501234999\",\n  \"contact_email\": \"new@company.sa\",\n  \"contact_website\": \"https://newsite.sa\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", ":id"],
+              "variable": [{ "key": "id", "value": "sl1" }]
+            }
+          }
+        },
+        {
+          "name": "Toggle Listing Active/Disabled",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/:id/toggle",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", ":id", "toggle"],
+              "variable": [{ "key": "id", "value": "sl1" }]
+            },
+            "description": "Flips is_active between true and false."
+          }
+        },
+        {
+          "name": "Delete Listing",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", ":id"],
+              "variable": [{ "key": "id", "value": "sl1" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Project Requests",
+      "item": [
+        {
+          "name": "List All Requests",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests?category=Construction+Materials&status=open&location=Riyadh&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests"],
+              "query": [
+                { "key": "category", "value": "Construction Materials", "description": "optional" },
+                { "key": "status", "value": "open", "description": "open | receiving_quotes | in_progress | closed (optional)" },
+                { "key": "location", "value": "Riyadh", "description": "optional" },
+                { "key": "page", "value": "1" },
+                { "key": "per_page", "value": "15" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Request",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", ":id"],
+              "variable": [{ "key": "id", "value": "pr1" }]
+            },
+            "description": "Returns request details. If the authenticated user is the owner, also includes the quotes array."
+          }
+        },
+        {
+          "name": "Get My Requests",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/mine",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", "mine"]
+            }
+          }
+        },
+        {
+          "name": "Create Request",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Construction Materials\",\n  \"title\": \"Structural Steel for Residential Tower — Phase 2\",\n  \"description\": \"Seeking a reliable supplier for structural steel (H-beams, I-beams) for a 24-floor tower in Riyadh.\",\n  \"quantity_needed\": \"800 tons\",\n  \"budget\": \"SAR 3,200,000\",\n  \"deadline\": \"2026-05-15\",\n  \"location\": \"Riyadh\",\n  \"tags\": [\"structural steel\", \"tower\", \"certified\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests"]
+            },
+            "description": "Creates a new project request. Decrements remainingRequests by 1. Returns 402 if limit reached."
+          }
+        },
+        {
+          "name": "Update Request",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Request Title\",\n  \"description\": \"Updated description.\",\n  \"budget\": \"SAR 3,500,000\",\n  \"deadline\": \"2026-06-01\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", ":id"],
+              "variable": [{ "key": "id", "value": "pr1" }]
+            }
+          }
+        },
+        {
+          "name": "Close (Mark as Completed)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/:id/close",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", ":id", "close"],
+              "variable": [{ "key": "id", "value": "pr1" }]
+            },
+            "description": "Sets status to 'closed'. Owner only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quotes",
+      "item": [
+        {
+          "name": "Submit a Quote (Supplier)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": \"SAR 2,950,000\",\n  \"timeline\": \"4 months (phased delivery)\",\n  \"message\": \"We have supplied structural steel for 10+ towers in Riyadh. SASO-certified. Can begin delivery within 2 weeks of contract signing.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/:requestId/quotes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", ":requestId", "quotes"],
+              "variable": [{ "key": "requestId", "value": "pr1" }]
+            },
+            "description": "Supplier submits a quote on a request. Automatically sets request status to 'receiving_quotes' if it was 'open'."
+          }
+        },
+        {
+          "name": "List Quotes on a Request (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/requests/:requestId/quotes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "requests", ":requestId", "quotes"],
+              "variable": [{ "key": "requestId", "value": "pr1" }]
+            },
+            "description": "Returns all quotes for a request. Only the request owner can call this."
+          }
+        },
+        {
+          "name": "Get My Sent Quotes (Supplier)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/quotes/sent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "quotes", "sent"]
+            }
+          }
+        },
+        {
+          "name": "Get Received Quotes (Owner)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/quotes/received",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "quotes", "received"]
+            }
+          }
+        },
+        {
+          "name": "Accept Quote",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/quotes/:id/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "quotes", ":id", "accept"],
+              "variable": [{ "key": "id", "value": "q1" }]
+            },
+            "description": "Accepts this quote, rejects all other quotes on the same request, and sets request status to 'in_progress'."
+          }
+        },
+        {
+          "name": "Shortlist Quote",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/quotes/:id/shortlist",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "quotes", ":id", "shortlist"],
+              "variable": [{ "key": "id", "value": "q1" }]
+            }
+          }
+        },
+        {
+          "name": "Reject Quote",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/quotes/:id/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "quotes", ":id", "reject"],
+              "variable": [{ "key": "id", "value": "q1" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inquiries",
+      "item": [
+        {
+          "name": "Send Inquiry on a Listing",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/listings/:listingId/inquiries",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "listings", ":listingId", "inquiries"],
+              "variable": [{ "key": "listingId", "value": "sl1" }]
+            },
+            "description": "Creates an inquiry record and opens a new chat thread of type 'inquiry'. Returns the new ChatThread. Idempotent — returns existing thread if one already exists."
+          }
+        },
+        {
+          "name": "Get My Inquiries",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/inquiries/mine",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "inquiries", "mine"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "List My Chat Threads",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/threads",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "threads"]
+            },
+            "description": "Returns all threads where the authenticated user is a participant, sorted by last_message_at desc."
+          }
+        },
+        {
+          "name": "Get Messages in Thread",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/threads/:id/messages?page=1&per_page=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "threads", ":id", "messages"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "per_page", "value": "50" }
+              ],
+              "variable": [{ "key": "id", "value": "t1" }]
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello, I am interested in your listing. Can we discuss pricing?\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/b2b/threads/:id/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "threads", ":id", "messages"],
+              "variable": [{ "key": "id", "value": "t1" }]
+            }
+          }
+        },
+        {
+          "name": "Mark Thread as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/threads/:id/read",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "threads", ":id", "read"],
+              "variable": [{ "key": "id", "value": "t1" }]
+            },
+            "description": "Sets unread_count to 0 and marks all messages in thread as read for the current user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "categories"]
+            },
+            "description": "Returns the list of available B2B categories. Expected values: Construction Materials, Electrical & Lighting, HVAC & Plumbing, IT & Technology, Furniture & Fixtures, Safety & PPE, Logistics & Transport, Industrial Equipment, Cleaning & Facilities, Food & Catering."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plans & Credits",
+      "item": [
+        {
+          "name": "Get Available Plans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/plans",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "plans"]
+            },
+            "description": "Returns plan definitions with included ad credits, request credits, and pricing."
+          }
+        },
+        {
+          "name": "Get My Credit Balance",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/b2b/me/credits",
+              "host": ["{{base_url}}"],
+              "path": ["api", "b2b", "me", "credits"]
+            },
+            "description": "Returns { remaining_ads, remaining_requests, plan }."
+          }
+        }
+      ]
+    }
+  ]
+}
